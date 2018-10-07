@@ -61,6 +61,11 @@ public class MyAnalysis {
         // Statement by lines
         System.out.println("Statement by lines");
         statementsByLine(projectDir);
+        
+        // Catch Block comments
+        System.out.println("catch block containing TODO and FIXME comments");
+        listCatchBlockTODOANDFIXMEERRORS(projectDir);
+    
     }
 
     /**
@@ -157,6 +162,31 @@ public class MyAnalysis {
                         }
                     }
                 }).explore(JavaParser.parse(file));
+                System.out.println(); // empty line
+            } catch (IOException e) {
+                new RuntimeException(e);
+            }
+        }).explore(projectDir);
+    }
+public static void listCatchBlockTODOANDFIXMEERRORS(File projectDir) {
+        new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
+            System.out.println(path);
+            System.out.println(Strings.repeat("=", path.length()));
+            try {
+                new VoidVisitorAdapter<Object>() {
+                    @Override
+                    public void visit(CatchClause n, Object arg) {
+                        super.visit(n, arg);
+                       ;
+                       for (Comment comment : n.getAllContainedComments()) {
+                    	   if(comment.getContent().toLowerCase().contains("fixme") || comment.getContent().toLowerCase().contains("todo")){
+                    		   System.out.println("There is a comment such as TODO or FIXME in the catch block of exceptions on line number "+comment.getBegin().get().line);
+                      
+                    	   }
+					}
+                        
+                    }
+                }.visit(JavaParser.parse(file), null);
                 System.out.println(); // empty line
             } catch (IOException e) {
                 new RuntimeException(e);
