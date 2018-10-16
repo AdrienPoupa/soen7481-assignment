@@ -3,9 +3,11 @@ package ca.concordia.soen7481.assignment;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.CatchClause;
@@ -19,14 +21,29 @@ import com.google.common.base.Strings;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Some code that uses JavaSymbolSolver.
  */
 public class MyAnalysis {
 
+	static HashMap<MethodDeclaration, Object> list_of_methods = new HashMap<MethodDeclaration, Object>();
+	static ArrayList<Statement> list_of_statements = new ArrayList<Statement>();
+
     public static void main(String[] args) {
-        // Set up a minimal type solver that only looks at the classes used to run this sample.
+
+    	init_setup();
+        make_checks_gagan();
+    }
+
+    public static void init_setup()
+    {
+    	// Set up a minimal type solver that only looks at the classes used to run this sample.
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver());
 
@@ -63,11 +80,11 @@ public class MyAnalysis {
         // Statement by lines
         System.out.println("Statement by lines");
         statementsByLine(projectDir);
-        
+
         // Catch Block comments
         System.out.println("catch block containing TODO and FIXME comments");
         listCatchBlockTODOANDFIXMEERRORS(projectDir);
-    
+
     }
 
     /**
@@ -108,6 +125,7 @@ public class MyAnalysis {
                     @Override
                     public void visit(MethodDeclaration n, Object arg) {
                         super.visit(n, arg);
+                        list_of_methods.put(n, arg);
                         System.out.println(" * " + n.getName());
                     }
                 }.visit(JavaParser.parse(file), null);
@@ -156,6 +174,7 @@ public class MyAnalysis {
                     @Override
                     public boolean handle(Node node) {
                         if (node instanceof Statement) {
+                        	list_of_statements.add((Statement)node);
                             System.out.println(" [Lines " + node.getBegin().get().line
                                     + " - " + node.getEnd().get().line + " ] " + node);
                             return false;
@@ -196,4 +215,143 @@ public class MyAnalysis {
                 }
             }).explore(projectDir);
         }
+
+
+    public static void make_checks_gagan()
+    {
+        if(check_for_equal_hashcode() == false)
+        {
+        	System.out.println("Error: Class defines equals() but not hashCode()");
+        }
+        if(check_string_comparison() == false)
+        {
+        	System.out.println("Error: Strings should not be compared using == or != unless constants or interned");
+        }
+    }
+
+    public static boolean check_conditions(Node n, ArrayList<String> variables)
+    {
+     	String n_class = n.getClass().getSimpleName().toString();
+    	if(n_class.equals("BinaryExpr") == true)
+    	{
+    		boolean checkVariable = false;
+    		if(((BinaryExpr)n).getOperator().toString().equals("EQUALS") == true)
+    		{
+    			checkVariable = true;
+    			//System.out.println("Class is : " + ((BinaryExpr)n).toString());
+    		}
+    		else if(((BinaryExpr)n).getOperator().toString().equals("NOT_EQUALS") == true)
+    		{
+    			checkVariable = true;
+    			//System.out.println("Class is : " + ((BinaryExpr)n).getOperator().toString());
+    		}
+    		if(checkVariable == true)
+    		{
+    			List nodes = (List)n.getChildNodes();
+    			for(int i = 0; i < nodes.size(); i++)
+    	    	{
+    	    		Node tmpN = (Node)nodes.get(i);
+    	    		if(tmpN.getClass().getSimpleName().equals("NameExpr") == true)
+    	    		{
+    	    			String variable_to_check = tmpN.toString();
+    	    			if(variables.contains(variable_to_check) == true)
+    	    			{
+    	    				return false;
+    	    			}
+    	    		}
+    	    		return check_conditions(tmpN, variables);
+    	    	}
+    		}
+    	}
+
+    	List nodes = (List)n.getChildNodes();
+    	for(int i = 0; i < nodes.size(); i++)
+    	{
+    		Node tmpN = (Node)nodes.get(i);
+    		if(check_conditions(tmpN, variables) == false)
+    		{
+    			return false;
+    		}
+    	}
+
+    	return true;
+    }
+
+    public static boolean check_string_comparison() {
+    	ArrayList<String> variables = new ArrayList<String>();
+    	for(Statement s : list_of_statements)
+    	{
+    		List nodes = (List)s.getChildNodes();
+    		for(int i =0; i < nodes.size(); i++)
+    		{
+    			Node n = (Node) nodes.get(i);
+    			String n_class = n.getClass().getSimpleName().toString();
+
+    			if(n_class.equals("ExpressionStmt"))
+    			{
+    				String stmt = n.toString();
+    				if((stmt.indexOf("=") != -1) && (stmt.substring(0, stmt.indexOf("=")) != null))
+    				{
+	    				if(stmt.substring(0, stmt.indexOf("=")).contains("String"))
+	    				{
+	    					int loc = stmt.indexOf("String") + 6;
+	    					int eloc = stmt.indexOf("=");
+	    					String tmp_add = stmt.substring(loc, eloc);
+	;    					tmp_add = tmp_add.replaceAll("\\s+","");
+	    					variables.add(tmp_add);
+	    				}
+    				}
+    			}
+    			if(n_class.equals("IfStmt") == true)
+    			{
+    				Node nCond = n.getChildNodes().get(0);
+    				return check_conditions(nCond, variables);
+    			}
+    		}
+    	}
+    	return true;
+    }
+
+    public static boolean check_for_equal_hashcode() {
+    	boolean equals_found = false;
+    	boolean hc_found = false;
+    	Iterator it = list_of_methods.entrySet().iterator();
+    	while(it.hasNext())
+    	{
+    		Map.Entry pair = (Map.Entry)it.next();
+    		MethodDeclaration md = (MethodDeclaration) pair.getKey();
+    		Object arg = pair.getValue();
+    		//System.out.println("Method: " + md.getNameAsString());
+    		if(md.getNameAsString().equals("equals") == true)
+    		{
+    			if(md.getTypeAsString().equals("boolean") == true)
+    			{
+    				NodeList<Parameter> nodes = md.getParameters();
+    				if((nodes.size() == 1) && (nodes.get(0).getTypeAsString().equals("Object") == true))
+    				{
+    					equals_found = true;
+    				}
+    			}
+    		}
+    		else if(md.getNameAsString().equals("hashCode") == true)
+    		{
+    			if(md.getTypeAsString().equals("int") == true)
+    			{
+    				NodeList<Parameter> nodes = md.getParameters();
+    				if(nodes.size() == 0) {
+    					hc_found = true;
+    				}
+    			}
+    		}
+    	}
+
+    	if(equals_found == true && hc_found == false)
+    	{
+    		return false;
+    	}
+    	else
+    	{
+    		return true;
+    	}
+    }
 }
