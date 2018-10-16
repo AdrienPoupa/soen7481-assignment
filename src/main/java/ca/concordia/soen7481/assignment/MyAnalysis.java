@@ -5,8 +5,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.stmt.CatchClause;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -168,29 +170,30 @@ public class MyAnalysis {
             }
         }).explore(projectDir);
     }
-public static void listCatchBlockTODOANDFIXMEERRORS(File projectDir) {
-        new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
-            System.out.println(path);
-            System.out.println(Strings.repeat("=", path.length()));
-            try {
-                new VoidVisitorAdapter<Object>() {
-                    @Override
-                    public void visit(CatchClause n, Object arg) {
-                        super.visit(n, arg);
-                       ;
-                       for (Comment comment : n.getAllContainedComments()) {
-                    	   if(comment.getContent().toLowerCase().contains("fixme") || comment.getContent().toLowerCase().contains("todo")){
-                    		   System.out.println("There is a comment such as TODO or FIXME in the catch block of exceptions on line number "+comment.getBegin().get().line);
-                      
-                    	   }
-					}
-                        
-                    }
-                }.visit(JavaParser.parse(file), null);
-                System.out.println(); // empty line
-            } catch (IOException e) {
-                new RuntimeException(e);
-            }
-        }).explore(projectDir);
-    }
+
+    public static void listCatchBlockTODOANDFIXMEERRORS(File projectDir) {
+            new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
+                System.out.println(path);
+                System.out.println(Strings.repeat("=", path.length()));
+                try {
+                    new VoidVisitorAdapter<Object>() {
+                        @Override
+                        public void visit(CatchClause n, Object arg) {
+                            super.visit(n, arg);
+                           ;
+                           for (Comment comment : n.getAllContainedComments()) {
+                               if(comment.getContent().toLowerCase().contains("fixme") || comment.getContent().toLowerCase().contains("todo")){
+                                   System.out.println("There is a comment such as TODO or FIXME in the catch block of exceptions on line number "+comment.getBegin().get().line);
+
+                               }
+                        }
+
+                        }
+                    }.visit(JavaParser.parse(file), null);
+                    System.out.println(); // empty line
+                } catch (IOException e) {
+                    new RuntimeException(e);
+                }
+            }).explore(projectDir);
+        }
 }
