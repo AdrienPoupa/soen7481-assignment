@@ -21,22 +21,22 @@ public class StringComparison implements Checker {
     		List nodes = s.getChildNodes();
             for (Object node : nodes) {
                 Node n = (Node) node;
-                String n_class = n.getClass().getSimpleName();
+                String nClass = n.getClass().getSimpleName();
 
-                if (n_class.equals("ExpressionStmt")) {
+                if (nClass.equals("ExpressionStmt")) {
                     String stmt = n.toString();
                     if (stmt.contains("=")) {
                         if (stmt.substring(0, stmt.indexOf("=")).contains("String")) {
                             int loc = stmt.indexOf("String") + 6;
                             int eloc = stmt.indexOf("=");
-                            String tmp_add = stmt.substring(loc, eloc);
+                            String tmpAdd = stmt.substring(loc, eloc);
                             ;
-                            tmp_add = tmp_add.replaceAll("\\s+", "");
-                            variables.add(tmp_add);
+                            tmpAdd = tmpAdd.replaceAll("\\s+", "");
+                            variables.add(tmpAdd);
                         }
                     }
                 }
-                if (n_class.equals("IfStmt")) {
+                if (nClass.equals("IfStmt")) {
                     Node nCond = n.getChildNodes().get(0);
                     return checkConditions(nCond, variables);
                 }

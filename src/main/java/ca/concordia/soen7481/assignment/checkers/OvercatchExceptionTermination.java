@@ -45,37 +45,39 @@ public class OvercatchExceptionTermination implements Checker {
 
                                     // Then, we'll go down to the MethodCallExpr and NameExpr to look for a System.exit
                                     // within the catch block
-                                    ExpressionStmt expressionStmt = s.asExpressionStmt();
-                                    Expression expression = expressionStmt.getExpression();
+                                    if (s.isExpressionStmt()) {
+                                        ExpressionStmt expressionStmt = s.asExpressionStmt();
+                                        Expression expression = expressionStmt.getExpression();
 
-                                    if (expression.isMethodCallExpr()) {
+                                        if (expression.isMethodCallExpr()) {
 
-                                        MethodCallExpr methodCallExpr = expression.asMethodCallExpr();
+                                            MethodCallExpr methodCallExpr = expression.asMethodCallExpr();
 
-                                        if (methodCallExpr.getScope().isPresent() &&
-                                                methodCallExpr.getScope().get().isNameExpr()) {
+                                            if (methodCallExpr.getScope().isPresent() &&
+                                                    methodCallExpr.getScope().get().isNameExpr()) {
 
-                                            NameExpr nameExpr = methodCallExpr.getScope().get().asNameExpr();
+                                                NameExpr nameExpr = methodCallExpr.getScope().get().asNameExpr();
 
-                                            // Found it!
-                                            if (nameExpr.getName().getIdentifier().equals("System") &&
-                                                    methodCallExpr.getName().getIdentifier().equals("exit")) {
+                                                // Found it!
+                                                if (nameExpr.getName().getIdentifier().equals("System") &&
+                                                        methodCallExpr.getName().getIdentifier().equals("exit")) {
 
-                                                // Get the method name by going back up
-                                                Node currentParent = n.getParentNode().orElse(null);
-                                                while (!(currentParent instanceof MethodDeclaration) && currentParent != null) {
-                                                    currentParent = currentParent.getParentNode().orElse(null);
+                                                    // Get the method name by going back up
+                                                    Node currentParent = n.getParentNode().orElse(null);
+                                                    while (!(currentParent instanceof MethodDeclaration) && currentParent != null) {
+                                                        currentParent = currentParent.getParentNode().orElse(null);
+                                                    }
+
+                                                    MethodDeclaration methodDeclaration = (MethodDeclaration) currentParent;
+
+                                                    System.out.println("Call to System.exit found in "+file+" function name: "+methodDeclaration.getName().getIdentifier());
+
+                                                    found[0] = true;
                                                 }
 
-                                                MethodDeclaration methodDeclaration = (MethodDeclaration) currentParent;
-
-                                                System.out.println("Call to System.exit found in "+file+" function name: "+methodDeclaration.getName().getIdentifier());
-
-                                                found[0] = true;
                                             }
 
                                         }
-
                                     }
 
                                 }

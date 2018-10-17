@@ -1,4 +1,4 @@
-public class ExceptionClass {
+public class TodoFixMeCatchBlock {
 
     /**
      * A test function that overcatches Exceptions and performs a System.exit
@@ -7,7 +7,8 @@ public class ExceptionClass {
         try {
 
         } catch (Exception e) {
-            System.exit(0);
+            // TODO: a todo comment
+            return;
         }
     }
 
