@@ -84,7 +84,6 @@ public class OvercatchExceptionTermination implements Checker {
                             }
                         }
                     }.visit(JavaParser.parse(file), null);
-                    System.out.println(); // empty line
                 } catch (IOException e) {
                     new RuntimeException(e);
                 }

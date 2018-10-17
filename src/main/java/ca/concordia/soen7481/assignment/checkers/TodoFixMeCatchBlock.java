@@ -5,7 +5,6 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.CatchClause;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.google.common.base.Strings;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +13,6 @@ public class TodoFixMeCatchBlock implements Checker {
     public boolean check(File projectDir) {
         final boolean[] found = {false};
             new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
-                System.out.println(path);
-                System.out.println(Strings.repeat("=", path.length()));
                 try {
                     new VoidVisitorAdapter<Object>() {
                         @Override
@@ -29,7 +26,6 @@ public class TodoFixMeCatchBlock implements Checker {
                             }
                         }
                     }.visit(JavaParser.parse(file), null);
-                    System.out.println(); // empty line
                 } catch (IOException e) {
                     new RuntimeException(e);
                 }
