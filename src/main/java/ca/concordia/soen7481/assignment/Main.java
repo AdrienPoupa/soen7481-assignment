@@ -64,6 +64,6 @@ public class Main {
         // Openstream
         System.out.println("Openstream");
         checker = new OpenStream();
-        checker.check(new File("filesToParse/OpenStream"));
+        checker.check(projectDir);
     }
 }
