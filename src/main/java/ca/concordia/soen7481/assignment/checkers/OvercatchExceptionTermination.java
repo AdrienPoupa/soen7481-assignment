@@ -17,6 +17,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class OvercatchExceptionTermination implements Checker {
     public boolean check(File projectDir) {
@@ -70,7 +71,7 @@ public class OvercatchExceptionTermination implements Checker {
 
                                                     MethodDeclaration methodDeclaration = (MethodDeclaration) currentParent;
 
-                                                    System.out.println("Call to System.exit found in "+file+" function name: "+methodDeclaration.getName().getIdentifier());
+                                                    System.out.println("Call to System.exit found in "+file+" function name: "+ Objects.requireNonNull(methodDeclaration).getName().getIdentifier());
 
                                                     found[0] = true;
                                                 }

@@ -1,6 +1,7 @@
 package ca.concordia.soen7481.assignment;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Explore a Directory
@@ -24,12 +25,12 @@ public class DirExplorer {
     }
 
     public void explore(File root) {
-        explore(0, "", root);
+        explore(0, root.toString(), root);
     }
 
     private void explore(int level, String path, File file) {
         if (file.isDirectory()) {
-            for (File child : file.listFiles()) {
+            for (File child : Objects.requireNonNull(file.listFiles())) {
                 explore(level + 1, path + "/" + child.getName(), child);
             }
         } else {

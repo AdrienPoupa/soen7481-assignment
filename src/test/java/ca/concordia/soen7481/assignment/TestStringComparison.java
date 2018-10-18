@@ -10,7 +10,7 @@ public class TestStringComparison {
 	
 	@Test
 	public void testStringComparison() {
-		Assert.assertTrue(new StringComparison().check(new File("filesToParse/StringComparison")));
+		Assert.assertTrue(new StringComparison().check(new File("filesToParse/StringComparison/StringComparison.java")));
 	}
 
 

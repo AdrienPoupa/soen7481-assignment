@@ -10,7 +10,7 @@ public class TestEqualHashcode {
 
 	@Test
 	public void testEqualHashcode() {
-		Assert.assertTrue(new EqualsHashcode().check(new File("filesToParse/EqualHashcode")));
+		Assert.assertTrue(new EqualsHashcode().check(new File("filesToParse/EqualsHashcode/EqualsHashcode.java")));
 	}
 
 }

@@ -57,7 +57,13 @@ public class Main {
         checker.check(projectDir);
 
         // Overcatch and System.exit
+        System.out.println("Overcatch and System.exit");
         checker = new OvercatchExceptionTermination();
         checker.check(projectDir);
+
+        // Openstream
+        System.out.println("Openstream");
+        checker = new OpenStream();
+        checker.check(new File("filesToParse/OpenStream"));
     }
 }

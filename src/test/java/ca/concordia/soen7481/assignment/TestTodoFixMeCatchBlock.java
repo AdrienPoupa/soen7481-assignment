@@ -10,7 +10,7 @@ public class TestTodoFixMeCatchBlock {
 
 	@Test
 	public void testTodoFixMeCatchBlock() {
-		Assert.assertTrue(new TodoFixMeCatchBlock().check(new File("filesToParse/TodoFixMeCatchBlock")));
+		Assert.assertTrue(new TodoFixMeCatchBlock().check(new File("filesToParse/TodoFixMeCatchBlock/TodoFixMeCatchBlock.java")));
 	}
 
 }

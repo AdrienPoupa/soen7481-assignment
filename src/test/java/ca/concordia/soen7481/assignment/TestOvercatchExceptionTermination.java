@@ -10,7 +10,7 @@ public class TestOvercatchExceptionTermination {
 
 	@Test
 	public void testOvercatchExceptionTermination() {
-		Assert.assertTrue(new OvercatchExceptionTermination().check(new File("filesToParse/OvercatchExceptionTermination")));
+		Assert.assertTrue(new OvercatchExceptionTermination().check(new File("filesToParse/OvercatchExceptionTermination/OvercatchExceptionTermination.java")));
 	}
 
 }

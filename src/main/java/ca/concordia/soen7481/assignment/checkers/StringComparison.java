@@ -30,7 +30,6 @@ public class StringComparison implements Checker {
                             int loc = stmt.indexOf("String") + 6;
                             int eloc = stmt.indexOf("=");
                             String tmpAdd = stmt.substring(loc, eloc);
-                            ;
                             tmpAdd = tmpAdd.replaceAll("\\s+", "");
                             variables.add(tmpAdd);
                         }
@@ -65,8 +64,8 @@ public class StringComparison implements Checker {
                 for (Object node : nodes) {
                     Node tmpN = (Node) node;
                     if (tmpN.getClass().getSimpleName().equals("NameExpr")) {
-                        String variable_to_check = tmpN.toString();
-                        if (variables.contains(variable_to_check)) {
+                        String variableToCheck = tmpN.toString();
+                        if (variables.contains(variableToCheck)) {
                             return false;
                         }
                     }

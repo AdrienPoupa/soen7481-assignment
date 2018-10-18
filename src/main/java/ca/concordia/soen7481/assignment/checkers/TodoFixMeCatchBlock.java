@@ -20,7 +20,8 @@ public class TodoFixMeCatchBlock implements Checker {
                             super.visit(n, arg);
                            for (Comment comment : n.getAllContainedComments()) {
                                if(comment.getContent().toLowerCase().contains("fixme") || comment.getContent().toLowerCase().contains("todo")){
-                                   System.out.println("There is a comment such as TODO or FIXME in the catch block of exceptions on line number "+comment.getBegin().get().line);
+                                   String lineNumber = (comment.getBegin().isPresent() ? String.valueOf(comment.getBegin().get().line) : "0");
+                                   System.out.println("There is a comment such as TODO or FIXME in the catch block of exceptions on line number "+lineNumber);
                                    found[0] = true;
                                }
                             }
