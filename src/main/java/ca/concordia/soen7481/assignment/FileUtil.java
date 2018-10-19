@@ -113,15 +113,4 @@ public class FileUtil {
             e.printStackTrace();
         }
     }
-
-    /**
-     * Credits: https://stackoverflow.com/a/27872852
-     * @param keyExtractor
-     * @param <T>
-     * @return
-     */
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
 }
