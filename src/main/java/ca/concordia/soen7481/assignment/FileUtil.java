@@ -63,7 +63,7 @@ public class FileUtil {
     /**
      * Replace the variables for the report
      */
-    static void generateReport(List<BugPattern> bugPatterns) {
+    static void generateReport(File path, List<BugPattern> bugPatterns) {
         try {
             String htmlString = new String(Files.readAllBytes(Paths.get("resources/report-template.html")),
                     StandardCharsets.UTF_8);
@@ -103,6 +103,7 @@ public class FileUtil {
                 counter2.getAndIncrement();
             });
 
+            htmlString = htmlString.replace("$path", path.getAbsolutePath());
             htmlString = htmlString.replace("$bugsSummmaryTable", bugSummaryTable);
             htmlString = htmlString.replace("$totalNumberOfBugs", String.valueOf(bugPatterns.size()));
             htmlString = htmlString.replace("$bugPatternsTable", bugsPatternsTable);

@@ -50,6 +50,6 @@ public class Main {
         System.out.println(bugPatterns);
 
         // Generate the report
-        FileUtil.generateReport(new ArrayList(bugPatterns));
+        FileUtil.generateReport(projectDir, new ArrayList(bugPatterns));
     }
 }
