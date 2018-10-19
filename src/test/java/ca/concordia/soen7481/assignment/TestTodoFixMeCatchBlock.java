@@ -11,8 +11,20 @@ import java.util.List;
 public class TestTodoFixMeCatchBlock {
 
 	@Test
-	public void testTodoFixMeCatchBlock() {
-		List<BugPattern> bugPatterns = new TodoFixMeCatchBlockChecker().check(new File("filesToParse/TodoFixMeCatchBlockBugPattern/TodoFixMeCatchBlockBugPattern.java"));
+	public void testTodoFixMeCatchBlockNoComment() {
+		List<BugPattern> bugPatterns = new TodoFixMeCatchBlockChecker().check(new File("filesToParse/TodoFixMeCatchBlock/TodoFixMeCatchBlockNoComment.java"));
+
+		Assert.assertEquals(0, bugPatterns.size());
+	}
+
+	@Test
+	public void testTodoFixMeCatchBlockComment() {
+		List<BugPattern> bugPatterns = new TodoFixMeCatchBlockChecker().check(new File("filesToParse/TodoFixMeCatchBlock/TodoFixMeCatchBlockComment.java"));
+
+		Assert.assertEquals(1, bugPatterns.size());
+		Assert.assertEquals("TodoFixMeCatchBlockComment.java", bugPatterns.get(0).getFilename());
+		Assert.assertEquals("testCatchBlock", bugPatterns.get(0).getFunctionName());
+		Assert.assertEquals(10, bugPatterns.get(0).getLine());
 	}
 
 }

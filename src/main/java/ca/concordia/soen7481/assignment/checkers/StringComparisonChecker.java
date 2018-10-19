@@ -6,6 +6,9 @@ import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.bugpatterns.StringComparisonBugPattern;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -22,6 +25,29 @@ public class StringComparisonChecker implements Checker {
 
     	ArrayList<String> variables = new ArrayList<>();
 
+    	// First, extract the String arguments from the function
+        new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
+            try {
+                new VoidVisitorAdapter<Object>() {
+                    @Override
+                    public void visit(MethodDeclaration n, Object arg) {
+                        super.visit(n, arg);
+
+                        NodeList<Parameter> nodes = n.getParameters();
+
+                        for (Parameter parameter : nodes) {
+                            if (parameter.getTypeAsString().equals("String")) {
+                                variables.add(parameter.getNameAsString());
+                            }
+                        }
+                    }
+                }.visit(JavaParser.parse(file), null);
+            } catch (IOException e) {
+                new RuntimeException(e);
+            }
+        }).explore(projectDir);
+
+        // Then, look at the expression statements, and look at if statements for String == String
         new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
             try {
                 new VoidVisitorAdapter<Object>() {
@@ -29,14 +55,12 @@ public class StringComparisonChecker implements Checker {
                     public void visit(ExpressionStmt n, Object arg) {
                         super.visit(n, arg);
                         String stmt = n.toString();
-                        if (stmt.contains("=")) {
-                            if (stmt.substring(0, stmt.indexOf("=")).contains("String")) {
-                                int loc = stmt.indexOf("String") + 6;
-                                int eloc = stmt.indexOf("=");
-                                String tmpAdd = stmt.substring(loc, eloc);
-                                tmpAdd = tmpAdd.replaceAll("\\s+", "");
-                                variables.add(tmpAdd);
-                            }
+                        if (stmt.contains("=") && stmt.substring(0, stmt.indexOf("=")).contains("String")) {
+                            int loc = stmt.indexOf("String") + 6;
+                            int eloc = stmt.indexOf("=");
+                            String tmpAdd = stmt.substring(loc, eloc);
+                            tmpAdd = tmpAdd.replaceAll("\\s+", "");
+                            variables.add(tmpAdd);
                         }
                     }
 
@@ -44,7 +68,7 @@ public class StringComparisonChecker implements Checker {
                     public void visit(IfStmt n, Object arg) {
                         super.visit(n, arg);
                         Node nCond = n.getChildNodes().get(0);
-                        if (!checkConditions(nCond, variables)) {
+                        if (shouldAddBugPattern(nCond, variables)) {
                             // Get line
                             int line = (n.getRange().isPresent() ? n.getRange().get().begin.line : 0);
 
@@ -64,11 +88,15 @@ public class StringComparisonChecker implements Checker {
     	return bugPatterns;
     }
 
-    private static boolean checkConditions(Node n, ArrayList<String> variables)
+    /**
+     * Detect problematic equal testing between Strings
+     * @param n
+     * @param variables
+     * @return
+     */
+    private static boolean shouldAddBugPattern(Node n, ArrayList<String> variables)
     {
-        String nClass = n.getClass().getSimpleName();
-        if(nClass.equals("BinaryExpr"))
-        {
+        if (n instanceof BinaryExpr) {
             boolean checkVariable = false;
 
             if (((BinaryExpr) n).getOperator().toString().equals("EQUALS")) {
@@ -80,28 +108,24 @@ public class StringComparisonChecker implements Checker {
             }
 
             if (checkVariable) {
-                List nodes = n.getChildNodes();
-                for (Object node : nodes) {
-                    Node tmpN = (Node) node;
-                    if (tmpN.getClass().getSimpleName().equals("NameExpr")) {
-                        String variableToCheck = tmpN.toString();
+                for (Node node : n.getChildNodes()) {
+                    if (node.getClass().getSimpleName().equals("NameExpr")) {
+                        String variableToCheck = node.toString();
                         if (variables.contains(variableToCheck)) {
-                            return false;
+                            return true;
                         }
                     }
-                    return checkConditions(tmpN, variables);
+                    return shouldAddBugPattern(node, variables);
                 }
             }
         }
 
-        List nodes = n.getChildNodes();
-        for (Object node : nodes) {
-            Node tmpN = (Node) node;
-            if (!checkConditions(tmpN, variables)) {
+        for (Node node : n.getChildNodes()) {
+            if (!shouldAddBugPattern(node, variables)) {
                 return false;
             }
         }
 
-        return true;
+        return false;
     }
 }

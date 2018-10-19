@@ -1,14 +1,13 @@
-public class TodoFixMeCatchBlock {
+public class OvercatchExceptionTerminationExit {
 
     /**
      * A test function that overcatches Exceptions and performs a System.exit
      */
-    public static void testException() {
+    public static void testTermination() {
         try {
 
         } catch (Exception e) {
-            // TODO: a todo comment
-            return;
+            System.exit(0);
         }
     }
 

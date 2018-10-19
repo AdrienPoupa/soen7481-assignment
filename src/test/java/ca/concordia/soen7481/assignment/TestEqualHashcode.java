@@ -11,8 +11,20 @@ import java.util.List;
 public class TestEqualHashcode {
 
 	@Test
-	public void testEqualHashcode() {
-        List<BugPattern> bugPatterns = new EqualsHashcodeChecker().check(new File("filesToParse/EqualsHashcodeBugPattern/EqualsHashcodeBugPattern.java"));
+	public void testEqualWithHashcode() {
+        List<BugPattern> bugPatterns = new EqualsHashcodeChecker().check(new File("filesToParse/EqualsHashcode/EqualsWithHashcode.java"));
+
+		Assert.assertEquals(0, bugPatterns.size());
+	}
+
+	@Test
+	public void testEqualWithoutHashcode() {
+		List<BugPattern> bugPatterns = new EqualsHashcodeChecker().check(new File("filesToParse/EqualsHashcode/EqualsWithoutHashcode.java"));
+
+		Assert.assertEquals(1, bugPatterns.size());
+		Assert.assertEquals("EqualsWithoutHashcode.java", bugPatterns.get(0).getFilename());
+		Assert.assertEquals("equals", bugPatterns.get(0).getFunctionName());
+		Assert.assertEquals(2, bugPatterns.get(0).getLine());
 	}
 
 }

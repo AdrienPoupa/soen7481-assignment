@@ -1,4 +1,4 @@
-public class EqualsHashcode {
+public class EqualsWithoutHashcode {
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub
@@ -7,7 +7,7 @@ public class EqualsHashcode {
 		String c = "pol";
 		String d = "acd";
 		
-		if((a.equals(d) == true) && (b.equals(c) == true) && (c.equals(d) == true))
+		if((a.equals(d)) && (b.equals(c)) && (c.equals(d)))
 		{
 			//
 		}

@@ -1,4 +1,4 @@
-public class EqualsHashcode {
+public class EqualsWithHashcode {
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub

@@ -1,7 +1,7 @@
-public class OpenStream {
+public class OpenStreamClosed {
 
     /**
-     * A test function that opens and does not close a stream
+     * A test function that opens and closes a stream
      */
     public static void testOpenStream() {
         FileInputStream in = null;
@@ -10,8 +10,6 @@ public class OpenStream {
         try {
             in = new FileInputStream("input.txt");
             out = new FileOutputStream("output.txt");
-
-            FileInputStream test = new FileInputStream("test.txt");
 
             int c;
             while ((c = in.read()) != -1) {
@@ -24,6 +22,7 @@ public class OpenStream {
             if (out != null) {
                 out.close();
             }
+            test.close();
         }
     }
 

@@ -11,8 +11,29 @@ import java.util.List;
 public class TestOpenStream {
 
 	@Test
-	public void testOpenStream() {
-		List<BugPattern> bugPatterns = new OpenStreamChecker().check(new File("filesToParse/OpenStreamBugPattern/OpenStreamBugPattern.java"));
+	public void testOpenStreamClosed() {
+		List<BugPattern> bugPatterns = new OpenStreamChecker().check(new File("filesToParse/OpenStream/OpenStreamClosed.java"));
+
+		Assert.assertEquals(0, bugPatterns.size());
+	}
+
+	@Test
+	public void testOpenStreamNotClosed() {
+		List<BugPattern> bugPatterns = new OpenStreamChecker().check(new File("filesToParse/OpenStream/OpenStreamNotClosed.java"));
+
+		Assert.assertEquals(3, bugPatterns.size());
+
+		Assert.assertEquals("OpenStreamNotClosed.java", bugPatterns.get(0).getFilename());
+		Assert.assertEquals("testOpenStream", bugPatterns.get(0).getFunctionName());
+		Assert.assertEquals(14, bugPatterns.get(0).getLine());
+
+		Assert.assertEquals("OpenStreamNotClosed.java", bugPatterns.get(1).getFilename());
+		Assert.assertEquals("testOpenStream", bugPatterns.get(1).getFunctionName());
+		Assert.assertEquals(11, bugPatterns.get(1).getLine());
+
+		Assert.assertEquals("OpenStreamNotClosed.java", bugPatterns.get(2).getFilename());
+		Assert.assertEquals("testOpenStream", bugPatterns.get(2).getFunctionName());
+		Assert.assertEquals(12, bugPatterns.get(2).getLine());
 	}
 
 }
