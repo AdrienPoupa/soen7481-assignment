@@ -1,16 +1,18 @@
 package ca.concordia.soen7481.assignment;
 
-import ca.concordia.soen7481.assignment.checkers.EqualsHashcode;
+import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
+import ca.concordia.soen7481.assignment.checkers.EqualsHashcodeChecker;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 
 public class TestEqualHashcode {
 
 	@Test
 	public void testEqualHashcode() {
-		Assert.assertTrue(new EqualsHashcode().check(new File("filesToParse/EqualsHashcode/EqualsHashcode.java")));
+        List<BugPattern> bugPatterns = new EqualsHashcodeChecker().check(new File("filesToParse/EqualsHashcodeBugPattern/EqualsHashcodeBugPattern.java"));
 	}
 
 }

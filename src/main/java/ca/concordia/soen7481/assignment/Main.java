@@ -1,9 +1,12 @@
 package ca.concordia.soen7481.assignment;
 
+import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.checkers.*;
-import ca.concordia.soen7481.assignment.visitors.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Some code that uses JavaSymbolSolver.
@@ -15,55 +18,38 @@ public class Main {
 
     static void initSetup()
     {
-        Visitor visitor;
+        // Delete the previous report
+        FileUtil.deleteFiles();
 
-        // List classes
         File projectDir = new File("filesToParse");
-        System.out.println("List classes");
-        visitor = new ClassList();
-        visitor.visit(projectDir);
 
-        // List classes
-        System.out.println("List methods");
-        visitor = new MethodList();
-        visitor.visit(projectDir);
-
-        // Method calls
-        System.out.println("Method calls");
-        visitor = new MethodCalls();
-        visitor.visit(projectDir);
-
-        // Statement by lines
-        System.out.println("Statement by lines");
-        visitor = new StatementLines();
-        visitor.visit(projectDir);
-
-        // Run Checkers
-        Checker checker;
+        // Create a hashset of bug patterns so that we won't have any duplicates
+        Set<BugPattern> bugPatterns = new HashSet<>();
 
         // Equals Hashcode
-        System.out.println("Equals hashcode");
-        checker = new EqualsHashcode();
-        checker.check(projectDir);
+        Checker checker = new EqualsHashcodeChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Catch Block comments
-        System.out.println("catch block containing TODO and FIXME comments");
-        checker = new TodoFixMeCatchBlock();
-        checker.check(projectDir);
+        checker = new TodoFixMeCatchBlockChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // String comparison
-        System.out.println("String comparison");
-        checker = new StringComparison();
-        checker.check(projectDir);
+        checker = new StringComparisonChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Overcatch and System.exit
-        System.out.println("Overcatch and System.exit");
-        checker = new OvercatchExceptionTermination();
-        checker.check(projectDir);
+        checker = new OvercatchExceptionTerminationChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Openstream
-        System.out.println("Openstream");
-        checker = new OpenStream();
-        checker.check(projectDir);
+        checker = new OpenStreamChecker();
+        bugPatterns.addAll(checker.check(projectDir));
+
+        // Display the bug patterns found in the console
+        System.out.println(bugPatterns);
+
+        // Generate the report
+        FileUtil.generateReport(new ArrayList(bugPatterns));
     }
 }

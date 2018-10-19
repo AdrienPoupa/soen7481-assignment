@@ -1,6 +1,8 @@
 package ca.concordia.soen7481.assignment.checkers;
 
 import ca.concordia.soen7481.assignment.DirExplorer;
+import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
+import ca.concordia.soen7481.assignment.bugpatterns.OpenStreamBugPattern;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -14,13 +16,15 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Check open streams
  * Inspired by https://github.com/spotbugs/spotbugs/blob/release-3.1/spotbugs/src/main/java/edu/umd/cs/findbugs/detect/FindOpenStream.java
  */
-public class OpenStream implements Checker {
+public class OpenStreamChecker implements Checker {
 
     private final String streamClasses = "InputStream|OutputStream" +
             "ByteArrayInputStream|ByteArrayOutputStream|" +
@@ -35,9 +39,11 @@ public class OpenStream implements Checker {
      */
 
     @Override
-    public boolean check(File projectDir) {
+    public List<BugPattern> check(File projectDir) {
         // Stream list: stream name, stream type
-        HashMap<String, String> streams = new HashMap<>();
+        HashMap<String, BugPattern> streams = new HashMap<>();
+
+        List<BugPattern> bugPatterns = new ArrayList<>();
 
         new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
             try {
@@ -74,8 +80,8 @@ public class OpenStream implements Checker {
                                                     // Append the stream name and type to the hashmap
                                                     if (type.getName().getIdentifier().matches(streamClasses)) {
 
-                                                        String streamType = type.getName().getIdentifier();
-                                                        streams.put(streamName, streamType);
+                                                        int line = (assignExpr.getRange().isPresent() ? assignExpr.getRange().get().begin.line : 0);
+                                                        streams.put(streamName, new OpenStreamBugPattern(line, file, n.getNameAsString()));
                                                     }
                                                 }
                                             }
@@ -93,7 +99,8 @@ public class OpenStream implements Checker {
 
                                                         // Append the stream name and type to the hashmap
                                                         if (streamType.matches(streamClasses)) {
-                                                            streams.put(streamName, streamType);
+                                                            int line = (variable.getRange().isPresent() ? variable.getRange().get().begin.line : 0);
+                                                            streams.put(streamName, new OpenStreamBugPattern(line, file, n.getNameAsString()));
                                                         }
                                                     }
                                                 });
@@ -131,7 +138,9 @@ public class OpenStream implements Checker {
             }
         }).explore(projectDir);
 
-        // If there are streams still in the list, they are not close: return false in this case
-        return streams.size() > 0;
+
+        streams.forEach((streamName, bugPattern) -> bugPatterns.add(bugPattern));
+
+        return bugPatterns;
     }
 }
