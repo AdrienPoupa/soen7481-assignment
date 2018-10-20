@@ -45,6 +45,10 @@ public class Main {
         // Openstream
         checker = new OpenStreamChecker();
         bugPatterns.addAll(checker.check(projectDir));
+        
+        // Empty Catch
+        checker = new EmptyCatchClauseChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Display the bug patterns found in the console
         System.out.println(bugPatterns);

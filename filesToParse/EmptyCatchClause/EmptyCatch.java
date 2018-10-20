@@ -1,4 +1,4 @@
-public class EmptyCatch {
+public class TodoFixMeCatchBlockComment {
 
     /**
      * A test function that has a comment in catch
@@ -7,8 +7,8 @@ public class EmptyCatch {
         try {
 
         } catch (Exception e) {
-            // TODO: a todo comment
-            return;
+            
+        	
         }
     }
 
