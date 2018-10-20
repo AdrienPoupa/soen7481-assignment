@@ -49,6 +49,10 @@ public class Main {
         // Empty Catch
         checker = new EmptyCatchClauseChecker();
         bugPatterns.addAll(checker.check(projectDir));
+        
+     // Inadequate logging information in catch blocks
+        checker = new DuplicateLoggingStatementInCatchBlockOfSameTryChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Display the bug patterns found in the console
         System.out.println(bugPatterns);
