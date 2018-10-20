@@ -21,81 +21,81 @@ import java.util.List;
 
 public class DuplicateLoggingStatementInCatchBlockOfSameTryChecker implements Checker {
 
-	@Override
-	public List<BugPattern> check(File projectDir) {
-		List<BugPattern> bugPatterns = new ArrayList<>();
+    @Override
+    public List<BugPattern> check(File projectDir) {
+        List<BugPattern> bugPatterns = new ArrayList<>();
 
         new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
-        	try {
+            try {
                 new VoidVisitorAdapter<Object>() {
                     @Override
                     public void visit(TryStmt n, Object arg) {
-						super.visit(n, arg);
+                        super.visit(n, arg);
 
-						ArrayList<String> al= new ArrayList<>();
+                        ArrayList<String> al = new ArrayList<>();
 
-						for (CatchClause c : n.getCatchClauses()) {
-							List<Node> childNodes = c.getChildNodes();
-							for (Node nodesInOneCatchBlock : childNodes) {
+                        for (CatchClause c : n.getCatchClauses()) {
+                            List<Node> childNodes = c.getChildNodes();
+                            for (Node nodesInOneCatchBlock : childNodes) {
 
-								if (nodesInOneCatchBlock instanceof BlockStmt) {
+                                if (nodesInOneCatchBlock instanceof BlockStmt) {
 
-									List<Statement> ListStatementOfCatchBlock=((BlockStmt) nodesInOneCatchBlock).getStatements();
+                                    List<Statement> ListStatementOfCatchBlock = ((BlockStmt) nodesInOneCatchBlock).getStatements();
 
-									for (Statement statementOfCatchBlock : ListStatementOfCatchBlock) {
+                                    for (Statement statementOfCatchBlock : ListStatementOfCatchBlock) {
 
-										List<Node> listNodeOfOneBlockStatementOfEachCatchBlock = statementOfCatchBlock.getChildNodes();
+                                        List<Node> listNodeOfOneBlockStatementOfEachCatchBlock = statementOfCatchBlock.getChildNodes();
 
-										for (Node nodeOfOneBlockStatementOfEachCatchBlock : listNodeOfOneBlockStatementOfEachCatchBlock) {
+                                        for (Node nodeOfOneBlockStatementOfEachCatchBlock : listNodeOfOneBlockStatementOfEachCatchBlock) {
 
-											if (nodeOfOneBlockStatementOfEachCatchBlock instanceof MethodCallExpr) {
+                                            if (nodeOfOneBlockStatementOfEachCatchBlock instanceof MethodCallExpr) {
 
-												MethodCallExpr method = ((MethodCallExpr) nodeOfOneBlockStatementOfEachCatchBlock);
-												String methodName = method.getNameAsString();
+                                                MethodCallExpr method = ((MethodCallExpr) nodeOfOneBlockStatementOfEachCatchBlock);
+                                                String methodName = method.getNameAsString();
 
-												// Flag to know if we should report the method
-												boolean shouldReportBug = false;
+                                                // Flag to know if we should report the method
+                                                boolean shouldReportBug = false;
 
-												if (methodName.matches("warn|println|info|debug|error")) {
-													if (method.getArguments().size() == 0) {
-														shouldReportBug = true;
-													}
+                                                if (methodName.matches("warn|println|info|debug|error")) {
+                                                    if (method.getArguments().size() == 0) {
+                                                        shouldReportBug = true;
+                                                    }
 
-													if (method.getArguments().size() == 1 &&
-															method.getArgument(0) instanceof StringLiteralExpr) {
-														String args = method.getArgument(0).toString();
+                                                    if (method.getArguments().size() == 1 &&
+                                                            method.getArgument(0) instanceof StringLiteralExpr) {
+                                                        String args = method.getArgument(0).toString();
 
-														if (!(al.contains(args))){
-															al.add(args);
-														} else {
-															shouldReportBug = true;
-														}
-													}
+                                                        if (!(al.contains(args))) {
+                                                            al.add(args);
+                                                        } else {
+                                                            shouldReportBug = true;
+                                                        }
+                                                    }
 
-													// Report the bug if need be
-													if (shouldReportBug) {
-														int lineNumber = Util.getLineNumber(method);
+                                                    // Report the bug if need be
+                                                    if (shouldReportBug) {
+                                                        int lineNumber = Util.getLineNumber(method);
 
-														// Get the method name by going back up
-														String functionName = Util.getFunctionName(n);
+                                                        // Get the method name by going back up
+                                                        String functionName = Util.getFunctionName(n);
 
-														bugPatterns.add(
-																new DuplicateLoggingStatementInCatchBlockOfSameTryBugPattern
-																		(lineNumber, file, functionName));
-													}
+                                                        bugPatterns.add(
+                                                                new DuplicateLoggingStatementInCatchBlockOfSameTryBugPattern
+                                                                        (lineNumber, file, functionName));
+                                                    }
 
 
-												}
-											}
-										}
-									}
-							  	}
-							}
-						}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-						al.clear();
+                        al.clear();
                     }
-                   
+
                 }.visit(JavaParser.parse(file), null);
             } catch (IOException e) {
                 new RuntimeException(e);
@@ -103,6 +103,6 @@ public class DuplicateLoggingStatementInCatchBlockOfSameTryChecker implements Ch
         }).explore(projectDir);
 
         return bugPatterns;
-	}
+    }
 
 }
