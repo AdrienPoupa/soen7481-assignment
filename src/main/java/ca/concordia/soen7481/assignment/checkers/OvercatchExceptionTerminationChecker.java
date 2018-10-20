@@ -1,7 +1,7 @@
 package ca.concordia.soen7481.assignment.checkers;
 
 import ca.concordia.soen7481.assignment.DirExplorer;
-import ca.concordia.soen7481.assignment.NodeIterator;
+import ca.concordia.soen7481.assignment.Util;
 import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.bugpatterns.OvercatchExceptionTerminationBugPattern;
 import com.github.javaparser.JavaParser;
@@ -67,9 +67,9 @@ public class OvercatchExceptionTerminationChecker implements Checker {
                                                     methodCallExpr.getName().getIdentifier().equals("exit")) {
 
                                                 // Get the method name by going back up
-                                                String functionName = NodeIterator.getFunctionName(n);
+                                                String functionName = Util.getFunctionName(n);
 
-                                                int lineNumber = NodeIterator.getLineNumber(s);
+                                                int lineNumber = Util.getLineNumber(s);
 
                                                 bugPatterns.add(new OvercatchExceptionTerminationBugPattern(lineNumber, file, functionName));
                                             }

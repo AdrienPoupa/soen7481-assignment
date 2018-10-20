@@ -1,7 +1,7 @@
 package ca.concordia.soen7481.assignment.checkers;
 
 import ca.concordia.soen7481.assignment.DirExplorer;
-import ca.concordia.soen7481.assignment.NodeIterator;
+import ca.concordia.soen7481.assignment.Util;
 import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.bugpatterns.TodoFixMeCatchBlockBugPattern;
 import com.github.javaparser.JavaParser;
@@ -27,10 +27,10 @@ public class TodoFixMeCatchBlockChecker implements Checker {
                        for (Comment comment : n.getAllContainedComments()) {
                            if (comment.getContent().toLowerCase().contains("fixme") || comment.getContent().toLowerCase().contains("todo")) {
 
-                               int lineNumber = NodeIterator.getLineNumber(comment);
+                               int lineNumber = Util.getLineNumber(comment);
 
                                // Get the method name by going back up
-                               String functionName = NodeIterator.getFunctionName(n);
+                               String functionName = Util.getFunctionName(n);
 
                                bugPatterns.add(new TodoFixMeCatchBlockBugPattern(lineNumber, file, functionName));
                            }

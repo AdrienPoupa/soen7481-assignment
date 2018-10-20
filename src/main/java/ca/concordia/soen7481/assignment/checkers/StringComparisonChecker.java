@@ -1,7 +1,7 @@
 package ca.concordia.soen7481.assignment.checkers;
 
 import ca.concordia.soen7481.assignment.DirExplorer;
-import ca.concordia.soen7481.assignment.NodeIterator;
+import ca.concordia.soen7481.assignment.Util;
 import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.bugpatterns.StringComparisonBugPattern;
 import com.github.javaparser.JavaParser;
@@ -73,7 +73,7 @@ public class StringComparisonChecker implements Checker {
                             int line = (n.getRange().isPresent() ? n.getRange().get().begin.line : 0);
 
                             // Get the method name by going back up
-                            String functionName = NodeIterator.getFunctionName(n);
+                            String functionName = Util.getFunctionName(n);
 
                             // Append to bug pattern
                             bugPatterns.add(new StringComparisonBugPattern(line, file, functionName));

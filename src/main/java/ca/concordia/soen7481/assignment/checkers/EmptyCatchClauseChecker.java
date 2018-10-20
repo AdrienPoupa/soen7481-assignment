@@ -1,7 +1,7 @@
 package ca.concordia.soen7481.assignment.checkers;
 
 import ca.concordia.soen7481.assignment.DirExplorer;
-import ca.concordia.soen7481.assignment.NodeIterator;
+import ca.concordia.soen7481.assignment.Util;
 import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.bugpatterns.EmptyCatchClauseBugPattern;
 import com.github.javaparser.JavaParser;
@@ -33,10 +33,10 @@ public class EmptyCatchClauseChecker  implements Checker {
 
                        // If there is no statement in the catch block
                        if(statements.isEmpty()) {
-                           int lineNumber = NodeIterator.getLineNumber(blockStatement);
+                           int lineNumber = Util.getLineNumber(blockStatement);
 
                            // Get the method name by going back up
-                           String functionName = NodeIterator.getFunctionName(n);
+                           String functionName = Util.getFunctionName(n);
 
                            bugPatterns.add(new EmptyCatchClauseBugPattern(lineNumber, file, functionName));
                        }

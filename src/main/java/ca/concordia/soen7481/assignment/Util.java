@@ -5,28 +5,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 
 import java.util.Objects;
 
-/**
- * A simple Node Iterator
- * Credits: https://github.com/ftomassetti/analyze-java-code-examples/blob/master/src/main/java/me/tomassetti/support/NodeIterator.java
- */
-public class NodeIterator {
-    public interface NodeHandler {
-        boolean handle(Node node);
-    }
-
-    private NodeHandler nodeHandler;
-
-    public NodeIterator(NodeHandler nodeHandler) {
-        this.nodeHandler = nodeHandler;
-    }
-
-    public void explore(Node node) {
-        if (nodeHandler.handle(node)) {
-            for (Node child : node.getChildNodes()) {
-                explore(child);
-            }
-        }
-    }
+public class Util {
 
     public static String getFunctionName(Node node) {
         // Get the method name by going back up
