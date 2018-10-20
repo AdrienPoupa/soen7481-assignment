@@ -83,8 +83,6 @@ public class DuplicateLoggingStatementInCatchBlockOfSameTryChecker implements Ch
                                                                 new DuplicateLoggingStatementInCatchBlockOfSameTryBugPattern
                                                                         (lineNumber, file, functionName));
                                                     }
-
-
                                                 }
                                             }
                                         }
