@@ -27,7 +27,7 @@ public class TodoFixMeCatchBlockChecker implements Checker {
                        for (Comment comment : n.getAllContainedComments()) {
                            if (comment.getContent().toLowerCase().contains("fixme") || comment.getContent().toLowerCase().contains("todo")) {
 
-                               int lineNumber = (comment.getBegin().isPresent() ? comment.getBegin().get().line : 0);
+                               int lineNumber = NodeIterator.getLineNumber(comment);
 
                                // Get the method name by going back up
                                String functionName = NodeIterator.getFunctionName(n);

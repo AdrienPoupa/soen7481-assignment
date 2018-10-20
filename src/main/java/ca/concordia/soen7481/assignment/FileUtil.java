@@ -6,12 +6,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * A Util class to handle formatting and writing the results in a text file
@@ -64,8 +60,14 @@ public class FileUtil {
             String htmlString = new String(Files.readAllBytes(Paths.get("resources/report-template.html")),
                     StandardCharsets.UTF_8);
 
-            Collection<BugPattern> bugPatternsUniqueInstances = bugPatterns.stream().collect(toMap(BugPattern::getIdentifier, p -> p, (p, q) -> p)).values();
+            // Get all the kinds of bug patterns present in the bug patterns list
+            Map<String, BugPattern> map = new HashMap<>();
+            for (BugPattern bugPattern : bugPatterns) {
+                map.putIfAbsent(bugPattern.getIdentifier(), bugPattern);
+            }
+            Collection<BugPattern> bugPatternsUniqueInstances = map.values();
 
+            // Build the bug patterns summary
             StringBuilder bugSummaryTable = new StringBuilder();
             AtomicInteger counter = new AtomicInteger(0);
             bugPatternsUniqueInstances.forEach(bug -> {
@@ -77,6 +79,7 @@ public class FileUtil {
                 counter.getAndIncrement();
             });
 
+            // Build the bug pattern table itself
             StringBuilder bugsPatternsTable = new StringBuilder();
             AtomicInteger counter2 = new AtomicInteger(0);
             bugPatterns.forEach(bug -> {

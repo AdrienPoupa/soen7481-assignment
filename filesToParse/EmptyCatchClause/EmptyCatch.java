@@ -1,4 +1,4 @@
-public class TodoFixMeCatchBlockComment {
+public class EmptyCatch {
 
     /**
      * A test function that has a comment in catch

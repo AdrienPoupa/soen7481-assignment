@@ -39,4 +39,8 @@ public class NodeIterator {
 
         return Objects.requireNonNull(methodDeclaration).getName().getIdentifier();
     }
+
+    public static int getLineNumber(Node statement) {
+        return statement.getRange().isPresent() ? statement.getRange().get().begin.line : 0;
+    }
 }

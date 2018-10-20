@@ -69,7 +69,7 @@ public class OvercatchExceptionTerminationChecker implements Checker {
                                                 // Get the method name by going back up
                                                 String functionName = NodeIterator.getFunctionName(n);
 
-                                                int lineNumber = (s.getRange().isPresent() ? s.getRange().get().begin.line : 0);
+                                                int lineNumber = NodeIterator.getLineNumber(s);
 
                                                 bugPatterns.add(new OvercatchExceptionTerminationBugPattern(lineNumber, file, functionName));
                                             }
