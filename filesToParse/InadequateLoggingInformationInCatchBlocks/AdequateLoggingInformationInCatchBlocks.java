@@ -1,12 +1,8 @@
+/**
+ * A test function that does not have a DUPLICATE LOGGING INFORMATION IN catch block of same try or catch block has no logging information
+ */
 public class InadequateLoggingInformationInCatchBlocks {
-
-    /**
-     * A test function that has a DUPLICATE LOGGING INFORMATION IN catch block of same try or catch block has no logging information
-     */
-	
-
     public static void anotherMain(String[] args) {
-        
     	try {
         	
         }

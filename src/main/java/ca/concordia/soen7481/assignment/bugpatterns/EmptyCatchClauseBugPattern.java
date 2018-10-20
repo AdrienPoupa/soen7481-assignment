@@ -3,7 +3,7 @@ package ca.concordia.soen7481.assignment.bugpatterns;
 import java.io.File;
 
 public class EmptyCatchClauseBugPattern extends BugPattern {
-     public EmptyCatchClauseBugPattern(int line, File file, String functionName) {
+    public EmptyCatchClauseBugPattern(int line, File file, String functionName) {
         super(line, file, functionName);
     }
 

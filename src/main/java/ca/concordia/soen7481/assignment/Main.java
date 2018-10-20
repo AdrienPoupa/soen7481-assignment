@@ -50,7 +50,7 @@ public class Main {
         checker = new EmptyCatchClauseChecker();
         bugPatterns.addAll(checker.check(projectDir));
         
-     // Inadequate logging information in catch blocks
+        // Inadequate logging information in catch blocks
         checker = new DuplicateLoggingStatementInCatchBlockOfSameTryChecker();
         bugPatterns.addAll(checker.check(projectDir));
 
