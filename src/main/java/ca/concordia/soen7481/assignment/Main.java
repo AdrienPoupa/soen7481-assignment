@@ -53,6 +53,10 @@ public class Main {
         // Inadequate logging information in catch blocks
         checker = new DuplicateLoggingStatementInCatchBlockOfSameTryChecker();
         bugPatterns.addAll(checker.check(projectDir));
+        
+        // Unused variable in loops
+        checker = new UnneededComputationInLoopsChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Display the bug patterns found in the console
         System.out.println(bugPatterns);

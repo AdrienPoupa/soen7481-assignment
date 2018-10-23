@@ -65,7 +65,7 @@ public abstract class BugPattern implements Bug {
 
     @Override
     public String toString() {
-        return "BugPattern{" +
+        return "\nBugPattern{" +
                 "identifier='" + getIdentifier() + '\'' +
                 ", fileName='" + getFilename() + '\'' +
                 ", functionName='" + functionName + '\'' +
