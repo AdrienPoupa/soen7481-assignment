@@ -57,6 +57,9 @@ public class Main {
         // Unused variable in loops
         checker = new UnneededComputationInLoopsChecker();
         bugPatterns.addAll(checker.check(projectDir));
+        
+        checker = new UnusedMethodChecker();
+        bugPatterns.addAll(checker.check(projectDir));
 
         // Display the bug patterns found in the console
         System.out.println(bugPatterns);

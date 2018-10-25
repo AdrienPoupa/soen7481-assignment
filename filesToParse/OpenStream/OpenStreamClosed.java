@@ -1,3 +1,6 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 public class OpenStreamClosed {
 
     /**
@@ -22,7 +25,7 @@ public class OpenStreamClosed {
             if (out != null) {
                 out.close();
             }
-            test.close();
+            //test.close();
         }
     }
 

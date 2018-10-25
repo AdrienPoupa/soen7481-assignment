@@ -25,15 +25,15 @@ public class TestOpenStream {
 
 		Assert.assertEquals("OpenStreamNotClosed.java", bugPatterns.get(0).getFilename());
 		Assert.assertEquals("testOpenStream", bugPatterns.get(0).getFunctionName());
-		Assert.assertEquals(14, bugPatterns.get(0).getLine());
+		Assert.assertEquals(17, bugPatterns.get(0).getLine());
 
 		Assert.assertEquals("OpenStreamNotClosed.java", bugPatterns.get(1).getFilename());
 		Assert.assertEquals("testOpenStream", bugPatterns.get(1).getFunctionName());
-		Assert.assertEquals(11, bugPatterns.get(1).getLine());
+		Assert.assertEquals(14, bugPatterns.get(1).getLine());
 
 		Assert.assertEquals("OpenStreamNotClosed.java", bugPatterns.get(2).getFilename());
 		Assert.assertEquals("testOpenStream", bugPatterns.get(2).getFunctionName());
-		Assert.assertEquals(12, bugPatterns.get(2).getLine());
+		Assert.assertEquals(15, bugPatterns.get(2).getLine());
 	}
 
 }
