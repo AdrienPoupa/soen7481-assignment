@@ -61,6 +61,9 @@ public class Main {
         checker = new UnusedMethodChecker();
         bugPatterns.addAll(checker.check(projectDir));
 
+        checker = new IneffectiveConditionChecker();
+        bugPatterns.addAll(checker.check(projectDir));
+        
         // Display the bug patterns found in the console
         System.out.println(bugPatterns);
 

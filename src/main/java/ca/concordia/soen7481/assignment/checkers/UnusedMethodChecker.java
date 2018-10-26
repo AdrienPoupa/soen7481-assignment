@@ -97,33 +97,6 @@ public class UnusedMethodChecker implements Checker {
 	                new RuntimeException(e);
 	            }
 	        }).explore(projectDir);
-		 
-		 
-		  
-//		 new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
-//			 try {
-//				 new VoidVisitorAdapter<Object>() {
-//					 @Override
-//					 public void visit(MethodCallExpr n, Object arg) {
-//						 super.visit(n, arg);
-//						 
-//						 Node a  =  n.getChildNodes().get(0);
-//						 
-//						 
-//						 Navigator.find
-//						 boolean used = false;
-//						 
-//						 if(used) {
-//							 if(a.equals("abc")) {
-//								 
-//							 }
-//						 }
-//					 }
-//				 }.visit(JavaParser.parse(file), null);
-//			 } catch (IOException e) {
-//				 new RuntimeException(e);
-//			 }
-//		 }).explore(projectDir);
 		
 		return bugPatterns;
 	}
