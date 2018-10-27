@@ -1,12 +1,9 @@
 package ca.concordia.soen7481.assignment.checkers;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import ca.concordia.soen7481.assignment.DirExplorer;
+import ca.concordia.soen7481.assignment.Util;
+import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
+import ca.concordia.soen7481.assignment.bugpatterns.UnusedMethodBugPattern;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -17,10 +14,12 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-import ca.concordia.soen7481.assignment.DirExplorer;
-import ca.concordia.soen7481.assignment.Util;
-import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
-import ca.concordia.soen7481.assignment.bugpatterns.UnusedMethodBugPattern;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UnusedMethodChecker implements Checker {
 
@@ -39,17 +38,17 @@ public class UnusedMethodChecker implements Checker {
 				CompilationUnit cu = JavaParser.parse(file);
 				  cu.findAll(MethodCallExpr.class).forEach(mce -> {
 				  String objClassName = mce.resolveInvokedMethod().getClassName();
-				  if(classMethodsMap.containsKey(objClassName)) {
+				  if (classMethodsMap.containsKey(objClassName)) {
 					  List<String> methodNames = classMethodsMap.get(objClassName);
 					  methodNames.add(mce.getNameAsString());
 				  } else {
-					  List<String> list = new ArrayList<String>();
+					  List<String> list = new ArrayList<>();
 					  list.add(mce.getNameAsString());
 					  classMethodsMap.put(objClassName, list);
 				  }
 				  });
-			 } catch(IOException e) {
-				  new RuntimeException(e);
+			 } catch(RuntimeException|IOException ignored) {
+
 			 }
 		 }).explore(projectDir);
 		
@@ -61,21 +60,21 @@ public class UnusedMethodChecker implements Checker {
 	                       super.visit(n, arg);
 
 	                       String className = n.getNameAsString();
-	                       if(classMethodsMap.containsKey(className)) {
+	                       if (classMethodsMap.containsKey(className)) {
 	                    	   List<String> classMethods = classMethodsMap.get(className);
 	                    	   
-	                    	   for(MethodDeclaration method : n.getMethods()) {
+	                    	   for (MethodDeclaration method : n.getMethods()) {
 	                    		   String currentClassMethodName = method.getNameAsString();
 	                    		   boolean found = false;
-		                    	   for(String methodName : classMethods) {
-		                    		   if(methodName.equals(currentClassMethodName)) {
+		                    	   for (String methodName : classMethods) {
+		                    		   if (methodName.equals(currentClassMethodName)) {
 		                    			   found = true;
 		                    			   break;
 		                    		   }
 		                    	   }
 		                    	   
 		                    	   // To report unused method which is not a main method
-		                    	   if(!found && !currentClassMethodName.equals("main")) {
+		                    	   if (!found && !currentClassMethodName.equals("main")) {
 		                    		   bugPatterns.add(new UnusedMethodBugPattern(Util.getLineNumber(method), file, currentClassMethodName));  
 		                    	   }
 	                    		   
@@ -83,8 +82,8 @@ public class UnusedMethodChecker implements Checker {
 	                    	   
 	                    	   
 	                       } else {
-	                    	   for(MethodDeclaration method : n.getMethods()) {
-	                    		   if(!method.getNameAsString().equals("main")) {
+	                    	   for (MethodDeclaration method : n.getMethods()) {
+	                    		   if (!method.getNameAsString().equals("main")) {
 	                    			   bugPatterns.add(new UnusedMethodBugPattern(Util.getLineNumber(method), file, method.getNameAsString()));
 	                    		   }
 	                    	   }
@@ -93,8 +92,7 @@ public class UnusedMethodChecker implements Checker {
 	                    }
 	                    
 	                }.visit(JavaParser.parse(file), null);
-	            } catch (IOException e) {
-	                new RuntimeException(e);
+	            } catch (RuntimeException|IOException ignored) {
 	            }
 	        }).explore(projectDir);
 		

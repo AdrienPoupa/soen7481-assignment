@@ -70,18 +70,20 @@ public class OpenStreamChecker implements Checker {
                                                 AssignExpr assignExpr = (AssignExpr) tryStatement.getExpression();
                                                 Expression value = assignExpr.getValue();
 
-                                                String streamName = ((NameExpr) assignExpr.getTarget()).getName().getIdentifier();
+                                                if (assignExpr.getTarget().isNameExpr()) {
+                                                    String streamName = ((NameExpr) assignExpr.getTarget()).getName().getIdentifier();
 
-                                                if (value.isObjectCreationExpr()) {
+                                                    if (value.isObjectCreationExpr()) {
 
-                                                    // Get type
-                                                    ClassOrInterfaceType type = ((ObjectCreationExpr) value).getType();
+                                                        // Get type
+                                                        ClassOrInterfaceType type = ((ObjectCreationExpr) value).getType();
 
-                                                    // Append the stream name and type to the hashmap
-                                                    if (type.getName().getIdentifier().matches(streamClasses)) {
+                                                        // Append the stream name and type to the hashmap
+                                                        if (type.getName().getIdentifier().matches(streamClasses)) {
 
-                                                        int line = (assignExpr.getRange().isPresent() ? assignExpr.getRange().get().begin.line : 0);
-                                                        streams.put(streamName, new OpenStreamBugPattern(line, file, n.getNameAsString()));
+                                                            int line = (assignExpr.getRange().isPresent() ? assignExpr.getRange().get().begin.line : 0);
+                                                            streams.put(streamName, new OpenStreamBugPattern(line, file, n.getNameAsString()));
+                                                        }
                                                     }
                                                 }
                                             }

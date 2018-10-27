@@ -57,10 +57,12 @@ public class Main {
         // Unused variable in loops
         checker = new UnneededComputationInLoopsChecker();
         bugPatterns.addAll(checker.check(projectDir));
-        
+
+        // Unused methods
         checker = new UnusedMethodChecker();
         bugPatterns.addAll(checker.check(projectDir));
 
+        // Ineffective condition checker
         checker = new IneffectiveConditionChecker();
         bugPatterns.addAll(checker.check(projectDir));
         

@@ -1,13 +1,12 @@
 package ca.concordia.soen7481.assignment;
 
-import java.io.File;
-import java.util.List;
-
+import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
+import ca.concordia.soen7481.assignment.checkers.IneffectiveConditionChecker;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
-import ca.concordia.soen7481.assignment.checkers.IneffectiveConditionChecker;
+import java.io.File;
+import java.util.List;
 
 public class TestIneffectiveCondition {
 	@Test

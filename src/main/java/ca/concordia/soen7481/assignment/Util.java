@@ -16,6 +16,10 @@ public class Util {
 
         MethodDeclaration methodDeclaration = (MethodDeclaration) currentParent;
 
+        if (methodDeclaration == null) {
+            return null;
+        }
+
         return Objects.requireNonNull(methodDeclaration).getName().getIdentifier();
     }
 

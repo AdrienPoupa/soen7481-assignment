@@ -1,49 +1,27 @@
 package ca.concordia.soen7481.assignment.checkers;
 
+import ca.concordia.soen7481.assignment.DirExplorer;
+import ca.concordia.soen7481.assignment.Util;
+import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
+import ca.concordia.soen7481.assignment.bugpatterns.UnneededComputationInLoopsBugPattern;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.AssignExpr;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.stmt.TryStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
-import ca.concordia.soen7481.assignment.DirExplorer;
-import ca.concordia.soen7481.assignment.Util;
-import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
-import ca.concordia.soen7481.assignment.bugpatterns.EqualsHashcodeBugPattern;
-import ca.concordia.soen7481.assignment.bugpatterns.OpenStreamBugPattern;
-import ca.concordia.soen7481.assignment.bugpatterns.OvercatchExceptionTerminationBugPattern;
-import ca.concordia.soen7481.assignment.bugpatterns.UnneededComputationInLoopsBugPattern;
-
 /**
  * This class will identify the presence of the bug pattern : Unneeded computation in loops.
  */
 public class UnneededComputationInLoopsChecker implements Checker {
-	// If we store variables as nodes, they arent equals
-	private ArrayList<String> variables = new ArrayList<String>();
-	private ArrayList<Node> variableNodes = new ArrayList<Node>();
-	private String declarationClass = "class com.github.javaparser.ast.expr.VariableDeclarationExpr";
+	// If we store variables as nodes, they are not equals
+	private ArrayList<String> variables = new ArrayList<>();
+	private ArrayList<Node> variableNodes = new ArrayList<>();
 	File file;
 	
 	/**
@@ -100,109 +78,133 @@ public class UnneededComputationInLoopsChecker implements Checker {
 		return bugPatterns;
 	}
 
-	protected void visitDoWhile(DoStmt doWhileStmt, List<BugPattern> bugPatterns) {
-		inspectBody((BlockStmt) doWhileStmt.getBody(), bugPatterns);
-		
+	private void visitDoWhile(DoStmt doWhileStmt, List<BugPattern> bugPatterns) {
+		if (doWhileStmt.getBody().isBlockStmt()) {
+			inspectBody((BlockStmt) doWhileStmt.getBody(), bugPatterns);
+		}
 		variables.clear();
 		variableNodes.clear();
 	}
 
 	private void visitWhile(WhileStmt whileStmt, List<BugPattern> bugPatterns) {
-		inspectBody((BlockStmt) whileStmt.getBody(), bugPatterns);
-		
+		if (whileStmt.getBody().isBlockStmt()) {
+			inspectBody((BlockStmt) whileStmt.getBody(), bugPatterns);
+		}
 		variables.clear();
 		variableNodes.clear();
 	}
 
 	/**
 	 * Check for loops and find the iterator variable.
-	 * @param forStmt
-	 * @param bugPatterns 
+	 * @param forStmt for statement
+	 * @param bugPatterns  bug patterns
 	 */
 	private void visitFor(ForStmt forStmt, List<BugPattern> bugPatterns) {
-		Node iteratorDeclaration = forStmt.getInitialization().get(0);
-		Node iterator = iteratorDeclaration.getChildNodes().get(0).getChildNodes().get(1);
-		variables.add(iterator.toString());
-		variableNodes.add(iterator);
-		inspectBody((BlockStmt) forStmt.getBody(), bugPatterns);
-		
-		variables.clear();
-		variableNodes.clear();
+		try {
+			Node iteratorDeclaration = forStmt.getInitialization().get(0);
+				Node iterator = iteratorDeclaration.getChildNodes().get(0).getChildNodes().get(1);
+				addVariable(bugPatterns, iterator, forStmt.getBody());
+		} catch (IndexOutOfBoundsException ignored) {
+
+		}
 	}
-	
-	/**
-	 * Check foreach loops and find the iterator variable.
-	 * @param bugPatterns 
-	 * @param forStmt
-	 */
-	private void visitForEach(ForeachStmt foreachStmt, List<BugPattern> bugPatterns) {
-		
-		Node iterator = foreachStmt.getVariable().getChildNodes().get(0);
+
+	private void addVariable(List<BugPattern> bugPatterns, Node iterator, Statement body) {
 		variables.add(iterator.toString());
 		variableNodes.add(iterator);
-		inspectBody((BlockStmt) foreachStmt.getBody(), bugPatterns);
-		
+		if (body.isBlockStmt()) {
+			inspectBody((BlockStmt) body, bugPatterns);
+		}
 		variables.clear();
 		variableNodes.clear();
 	}
 
 	/**
+	 * Check foreach loops and find the iterator variable.
+	 * @param foreachStmt foreach statement
+	 * @param bugPatterns bug patterns
+	 */
+	private void visitForEach(ForeachStmt foreachStmt, List<BugPattern> bugPatterns) {
+		try {
+			Node iterator = foreachStmt.getVariable().getChildNodes().get(0);
+			if (iterator != null) {
+				addVariable(bugPatterns, iterator, foreachStmt.getBody());
+			}
+		} catch (IndexOutOfBoundsException ignored) {
+
+		}
+	}
+
+	/**
 	 * To inspect all the body of any kind of loops. Check if there is any unneeded computation.
 	 * @param body block to inspect
-	 * @param bugPatterns 
-	 * @return 
+	 * @param bugPatterns bug patterns
 	 */
-	protected void inspectBody(BlockStmt body, List<BugPattern> bugPatterns) {
+	private void inspectBody(BlockStmt body, List<BugPattern> bugPatterns) {
 		NodeList<Statement> lines = body.getStatements();
 		
 		// For each line of code in loop's body
 		for(Statement line : lines) {
 			if (line.isExpressionStmt()) {
-				Node expression = line.getChildNodes().get(0).getChildNodes().get(0);
-				// a or int a
-				Node leftVar = expression.getChildNodes().get(0);
-				boolean declarationStmt = line.getChildNodes().get(0).getClass().toString().equals(declarationClass);
-				
-				if(declarationStmt) {
-					leftVar = expression.getChildNodes().get(1);
-					variables.add(leftVar.toString());
-					variableNodes.add(leftVar);
-				}
-				
-				// If a declaration statement has a right member
-				if(declarationStmt && expression.getChildNodes().size() > 1) {
-					Node rightExpression = expression.getChildNodes().get(2);
-					
-					for(Node rightVar : rightExpression.getChildNodes()) {
-						if(variables.contains(rightVar.toString())) {
-							int index = variables.indexOf(rightVar.toString());
-							variableNodes.remove(index);
-							variables.remove(rightVar.toString());
+				try {
+					Node expression = line.getChildNodes().get(0).getChildNodes().get(0);
+					// a or int a
+					String declarationClass = "class com.github.javaparser.ast.expr.VariableDeclarationExpr";
+					boolean declarationStmt = line.getChildNodes().get(0).getClass().toString().equals(declarationClass);
+
+					if (declarationStmt) {
+						try {
+							Node leftVar = expression.getChildNodes().get(1);
+							variables.add(leftVar.toString());
+							variableNodes.add(leftVar);
+						} catch (IndexOutOfBoundsException ignored) {
+
 						}
 					}
-				} 
-				// If a simple statement has a right member
-				else if(line.getChildNodes().get(0).getChildNodes().size() > 0) {
-					Node rightExpression = line.getChildNodes().get(0).getChildNodes().get(1);
-					
-					for(Node rightVar : rightExpression.getChildNodes()) {
-						if(variables.contains(rightVar.toString())) {
-							int index = variables.indexOf(rightVar.toString());
-							variableNodes.remove(index);
-							variables.remove(rightVar.toString());
+
+					// If a declaration statement has a right member
+					if (declarationStmt && expression.getChildNodes().size() > 1) {
+						try {
+							Node rightExpression = expression.getChildNodes().get(2);
+
+							removeVariables(rightExpression);
+						} catch (IndexOutOfBoundsException ignored) {
+
 						}
 					}
+					// If a simple statement has a right member
+					else if (line.getChildNodes().get(0).getChildNodes().size() > 0) {
+						try {
+							Node rightExpression = line.getChildNodes().get(0).getChildNodes().get(1);
+
+							removeVariables(rightExpression);
+						} catch (IndexOutOfBoundsException ignored) {
+
+						}
+					}
+				} catch (IndexOutOfBoundsException ignored) {
+
 				}
 			}
 		}
 				
-		if(variableNodes.size() > 0) {
+		if (variableNodes.size() > 0) {
 			for(Node n : variableNodes) {
 				String functionName = Util.getFunctionName(n);
 	            int lineNumber = Util.getLineNumber(n);
 	            
 	            bugPatterns.add(new UnneededComputationInLoopsBugPattern(lineNumber, file, functionName));
 			}            
+		}
+	}
+
+	private void removeVariables(Node rightExpression) {
+		for(Node rightVar : rightExpression.getChildNodes()) {
+			if (variables.contains(rightVar.toString())) {
+				int index = variables.indexOf(rightVar.toString());
+				variableNodes.remove(index);
+				variables.remove(rightVar.toString());
+			}
 		}
 	}
 

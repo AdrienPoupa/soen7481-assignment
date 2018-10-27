@@ -1,21 +1,19 @@
 package ca.concordia.soen7481.assignment.checkers;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.BinaryExpr.Operator;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
 import ca.concordia.soen7481.assignment.DirExplorer;
 import ca.concordia.soen7481.assignment.Util;
 import ca.concordia.soen7481.assignment.bugpatterns.BugPattern;
 import ca.concordia.soen7481.assignment.bugpatterns.IneffectiveConditionBugPattern;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IneffectiveConditionChecker implements Checker {
 
