@@ -23,7 +23,9 @@ public class StringComparisonChecker implements Checker {
     public List<BugPattern> check(File projectDir) {
         List<BugPattern> bugPatterns = new ArrayList<>();
 
-        Map<String, Set<String>> variables = new HashMap<>();
+        // Stock the variables in a nested Hashmap, like:
+        // Classname -> [functionName -> variables]
+        Map<String, Map<String, Set<String>>> variables = new HashMap<>();
 
     	// First, extract the String arguments from the function
         new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
@@ -38,15 +40,27 @@ public class StringComparisonChecker implements Checker {
                         for (Parameter parameter : nodes) {
                             if (parameter.getTypeAsString().equals("String")) {
                                 String className = Util.getClassName(n);
+                                String functionName = n.getNameAsString();
 
-                                if (variables.containsKey(className)) {
-                                    // This class is known: add the method name to the hashset
-                                    variables.get(className).add(parameter.getNameAsString());
-                                } else {
-                                    // First time we loop on this class: create the hashset and add the method name
-                                    Set<String> methodSet = new HashSet<>();
-                                    methodSet.add(parameter.getNameAsString());
-                                    variables.put(className, methodSet);
+                                if (className != null && functionName != null) {
+                                    if (variables.containsKey(className)) {
+                                        // This class is known: add the method name to the hashset
+                                        Map<String, Set<String>> mapClass = variables.get(className);
+                                        if (mapClass.containsKey(functionName)) {
+                                            mapClass.get(functionName).add(parameter.getNameAsString());
+                                        } else {
+                                            Set<String> methodSet = new HashSet<>();
+                                            methodSet.add(parameter.getNameAsString());
+                                            mapClass.put(functionName, methodSet);
+                                        }
+                                    } else {
+                                        // First time we loop on this class: create the hashset and add the method name
+                                        Map<String, Set<String>> mapClass = new HashMap<>();
+                                        Set<String> methodSet = new HashSet<>();
+                                        methodSet.add(parameter.getNameAsString());
+                                        mapClass.put(functionName, methodSet);
+                                        variables.put(className, mapClass);
+                                    }
                                 }
                             }
                         }
@@ -73,15 +87,27 @@ public class StringComparisonChecker implements Checker {
                             tmpAdd = tmpAdd.replaceAll("\\s+", "");
 
                             String className = Util.getClassName(n);
+                            String functionName = Util.getFunctionName(n);
 
-                            if (variables.containsKey(className)) {
-                                // This class is known: add the method name to the hashset
-                                variables.get(className).add(tmpAdd);
-                            } else {
-                                // First time we loop on this class: create the hashset and add the method name
-                                Set<String> methodSet = new HashSet<>();
-                                methodSet.add(tmpAdd);
-                                variables.put(className, methodSet);
+                            if (className != null && functionName != null) {
+                                if (variables.containsKey(className)) {
+                                    // This class is known: add the method name to the hashset
+                                    Map<String, Set<String>> mapClass = variables.get(className);
+                                    if (mapClass.containsKey(functionName)) {
+                                        mapClass.get(functionName).add(tmpAdd);
+                                    } else {
+                                        Set<String> methodSet = new HashSet<>();
+                                        methodSet.add(tmpAdd);
+                                        mapClass.put(className, methodSet);
+                                    }
+                                } else {
+                                    // First time we loop on this class: create the hashset and add the method name
+                                    Map<String, Set<String>> mapClass = new HashMap<>();
+                                    Set<String> methodSet = new HashSet<>();
+                                    methodSet.add(tmpAdd);
+                                    mapClass.put(functionName, methodSet);
+                                    variables.put(className, mapClass);
+                                }
                             }
                         }
                     }
@@ -91,12 +117,15 @@ public class StringComparisonChecker implements Checker {
                         super.visit(n, arg);
                         Node nCond = n.getChildNodes().get(0);
                         String className = Util.getClassName(n);
-                        if (variables.containsKey(className) && shouldAddBugPattern(nCond, variables.get(className))) {
+                        String functionName = Util.getFunctionName(n);
+                        if (nCond != null &&
+                            className != null &&
+                            functionName != null &&
+                            variables.containsKey(className) &&
+                            variables.get(className).containsKey(functionName) &&
+                            shouldAddBugPattern(nCond, variables.get(className).get(functionName))) {
                             // Get line
                             int line = (n.getRange().isPresent() ? n.getRange().get().begin.line : 0);
-
-                            // Get the method name by going back up
-                            String functionName = Util.getFunctionName(n);
 
                             // Append to bug pattern
                             bugPatterns.add(new StringComparisonBugPattern(line, file, functionName));
