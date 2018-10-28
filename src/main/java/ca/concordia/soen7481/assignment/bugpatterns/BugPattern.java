@@ -71,6 +71,6 @@ public abstract class BugPattern implements Bug {
                 ", functionName='" + functionName + '\'' +
                 ", line=" + line +
                 ", path='" + getPath() + '\'' +
-                '}';
+                "}";
     }
 }

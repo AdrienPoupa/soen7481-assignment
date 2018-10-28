@@ -19,7 +19,7 @@ public class Main {
     static void initSetup()
     {
         // Delete the previous report
-        FileUtil.deleteFiles();
+        Util.deleteFiles();
 
         File projectDir = new File("filesToParse");
 
@@ -70,6 +70,6 @@ public class Main {
         System.out.println(bugPatterns);
 
         // Generate the report
-        FileUtil.generateReport(projectDir, new ArrayList(bugPatterns));
+        Util.generateReport(projectDir, new ArrayList(bugPatterns));
     }
 }
