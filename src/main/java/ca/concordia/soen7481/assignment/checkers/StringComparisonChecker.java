@@ -13,7 +13,8 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
+import com.github.javaparser.ast.expr.DoubleLiteralExpr;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -134,6 +135,13 @@ public class StringComparisonChecker implements Checker {
             if(((BinaryExpr) n).getRight().toString().equals("null")) {
             	checkVariable = false;
             }
+              if((((BinaryExpr) n).getRight() instanceof IntegerLiteralExpr)||(((BinaryExpr) n).getRight() instanceof DoubleLiteralExpr)) {	
+            	checkVariable = false;
+            }
+            
+			if((((BinaryExpr) n).getLeft() instanceof IntegerLiteralExpr)||(((BinaryExpr) n).getLeft() instanceof DoubleLiteralExpr)) {          	
+				checkVariable = false;
+			 }
 
             if (checkVariable) {
                 for (Node node : n.getChildNodes()) {
