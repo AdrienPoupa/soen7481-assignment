@@ -106,6 +106,15 @@ public class StringComparisonChecker implements Checker {
             else if (((BinaryExpr) n).getOperator().toString().equals("NOT_EQUALS")) {
                 checkVariable = true;
             }
+            
+             if(((BinaryExpr) n).getLeft().toString().equals("null")) {
+            	
+            	checkVariable = false;
+            }
+            if(((BinaryExpr) n).getRight().toString().equals("null")) {
+            
+            	checkVariable = false;
+            }
 
             if (checkVariable) {
                 for (Node node : n.getChildNodes()) {
