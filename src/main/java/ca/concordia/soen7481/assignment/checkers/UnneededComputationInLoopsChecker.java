@@ -145,6 +145,7 @@ public class UnneededComputationInLoopsChecker implements Checker {
 		
 		// For each line of code in loop's body
 		for(Statement line : lines) {
+			
 			if (line.isExpressionStmt()) {
 				try {
 					Node expression = line.getChildNodes().get(0).getChildNodes().get(0);
@@ -166,7 +167,6 @@ public class UnneededComputationInLoopsChecker implements Checker {
 					if (declarationStmt && expression.getChildNodes().size() > 1) {
 						try {
 							Node rightExpression = expression.getChildNodes().get(2);
-
 							removeVariables(rightExpression);
 						} catch (IndexOutOfBoundsException ignored) {
 
@@ -176,16 +176,19 @@ public class UnneededComputationInLoopsChecker implements Checker {
 					else if (line.getChildNodes().get(0).getChildNodes().size() > 0) {
 						try {
 							Node rightExpression = line.getChildNodes().get(0).getChildNodes().get(1);
-
 							removeVariables(rightExpression);
 						} catch (IndexOutOfBoundsException ignored) {
 
 						}
-					}
+					} 
 				} catch (IndexOutOfBoundsException ignored) {
 
 				}
 			}
+
+			//Check used variables on the line
+			List<Node> instructions = (List<Node>) line.getChildNodes();
+			findVariables(instructions);
 		}
 				
 		if (variableNodes.size() > 0) {
@@ -198,6 +201,21 @@ public class UnneededComputationInLoopsChecker implements Checker {
 		}
 	}
 
+	private void findVariables(List<Node> instructions) {
+		if(instructions == null || instructions.size() == 0) return;
+		
+		if(instructions.size() == 0) {
+			return;
+		}
+		
+		for(Node n : instructions) {
+			findVariables((List<Node>) n.getChildNodes());
+			if(variables.contains(n.toString())) {
+				removeVariables(n);
+			}
+		}		
+	}
+
 	private void removeVariables(Node rightExpression) {
 		for(Node rightVar : rightExpression.getChildNodes()) {
 			if (variables.contains(rightVar.toString())) {
@@ -207,5 +225,4 @@ public class UnneededComputationInLoopsChecker implements Checker {
 			}
 		}
 	}
-
 }

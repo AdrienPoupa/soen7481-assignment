@@ -1,14 +1,20 @@
 public class UnneededComputationException {
 
 	public boolean forLoop() {
-    	int c = 0;
-    	
-        for(int i = 0; i < 4; i++) {
-        	int a = 5 + c;
-        	int b = 6; 
-        	
-        	c = a + i;
-        }
+		for (Map.Entry<String,Host> nodeEntry : nodeCollections.entrySet()) {
+		      Host host = nodeEntry.getValue();
+		      
+		      for (Node nm : host.nms.values()) {
+		          if (labels != null) {
+		            labels.removeAll(labelsToRemove);
+		          }
+		        }
+		 
+		      if (null != host) {
+		        host.labels.removeAll(labelsToRemove);
+		        
+		      }
+		    }
     }
 	
 	public boolean foreachLoop() {
